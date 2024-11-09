@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             //
             $table->string('phone')->unique();
-            $table->foreignId('address_id')->constrained();
+            $table->string('role')->default('user');
+            $table->foreignId('address_id')->nullable()->constrained();
         });
     }
 

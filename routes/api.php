@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\api\ImageController;
+use App\Http\Controllers\api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +15,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::group(['prefix'=> 'auth'],function(){
+    Route::post('login',[UserController::class, 'login']);
+    Route::post('getOTP',[UserController::class, 'getOTP']);
+    Route::post('verifyOTP',[UserController::class, 'verifyOTP']);
+    Route::post('image/upload',[ImageController::class, 'upload']);
+    // Route::post('image/upload',[ImageController::class, 'upload']);
+} );
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
+    Route::get('logout', [UserController::class, 'logout']);
+} );
