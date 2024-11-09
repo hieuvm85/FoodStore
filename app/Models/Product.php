@@ -11,17 +11,17 @@ class Product extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Address::class,'category_product');
+        return $this->belongsToMany(Category::class,'category_product');
     }
 
     public function flavors()
     {
-        return $this->belongsToMany(Address::class,'flavor_product');
+        return $this->belongsToMany(Flavor::class,'flavor_product');
     }
 
     public function characteristics()
     {
-        return $this->belongsToMany(Address::class,'characteristic_product');
+        return $this->belongsToMany(Characteristic::class,'characteristic_product');
     }
 
     public function images()
