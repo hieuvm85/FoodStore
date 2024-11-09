@@ -12,4 +12,8 @@ class UserRepository{
         $user = User::where($loginField, $username)->first();
         return $user;
     }
+
+    public function saveOrUpdate(User $user){
+        $user->save();
+    }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendMailResetPaswordJob;
 use App\Jobs\SendOTPJob;
+use App\Mail\SendResetPasswordEmail;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Exception;
@@ -95,15 +97,90 @@ class UserController extends Controller
             $request->validate([
                 // "email" => "required|email",
                 "otp" => "required"
-            ]);
-            
-
-
+            ] );          
             if( $request->otp === $request->cookie("otp"))   
 
                 return response()->json(['status' => true]);
             else
                 return response()->json(['status' => false]);
+        }
+        catch(Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function resetPassword(Request $request){
+
+        try{
+            $request->validate([
+                'username' => 'required', // Có thể là email hoặc số điện thoại
+                "otp" => "required"
+            ]);
+            if( !$request->otp === $request->cookie("otp")){
+                return response()->json([
+                    'status' => 302,
+                    'message' => "wrong otp"
+                ]);
+            }   
+            
+            $user = $this->userRepository->getUserByEmailOrPhone($request->username);
+        
+            if ( !$user ) {
+                return response()->json([
+                    'message' => 'user does not exist',
+                ], 401);
+            }
+
+            $user->password = "foodstore247";
+
+            $this->userRepository->saveOrUpdate($user);
+
+            SendMailResetPaswordJob::dispatch($user->email, $user->password);
+
+            $token = $user->createToken('UserToken')->accessToken;
+
+            
+            return response()->json([
+                
+                'token' =>$token,
+                'role' =>$user->role
+            ]);
+        }
+        catch(Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
+    
+    public function changePassword(Request $request){
+
+        try{
+            $request->validate([
+                'current_password' => 'required',
+                'new_password' => 'required|min:6', 
+                'password_confirmation'=> 'required'
+            ]);
+
+            if (!($request->new_password === $request->password_confirmation)) {
+                return response()->json([
+                    'message' => 'The new password field confirmation does not match'
+                ], 400);
+            }
+
+            
+            if (!($request->current_password == Auth::user()->password)) {
+                return response()->json([
+                    'message' => 'Mật khẩu cũ không đúng.'
+                ], 400);
+            }
+
+            $user = Auth::user();
+            $user->password = $request->new_password;
+            $this->userRepository->saveOrUpdate($user);
+
+            return response()->json([
+                'message' => 'Mật khẩu đã được thay đổi thành công.'
+            ]);
         }
         catch(Exception $e){
             return response()->json($e->getMessage());
