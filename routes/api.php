@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
     Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
         Route::group(['prefix' => 'product'], function () {
             Route::post('create', [ProductController::class, 'create']);
+            Route::put('update', [ProductController::class, 'update']);
         });
     });
 } );

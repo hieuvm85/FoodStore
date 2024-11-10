@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Image extends Model
 {
+    protected $fillable = ['link', 'product_id'];
+    
     use HasFactory;
 
     public function product()
