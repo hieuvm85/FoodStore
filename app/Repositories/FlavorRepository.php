@@ -14,4 +14,10 @@ class FlavorRepository{
         return Flavor::where('id',$id)->first();
     }
     
+    public function getAll(){
+        return Flavor::all();
+    }
+    public function delete($id){
+        Flavor::destroy($id);
+    }
 }

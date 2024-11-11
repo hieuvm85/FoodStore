@@ -11,4 +11,12 @@ class CategoryRepository{
     public function getCategoryById($id){
         return Category::where('id', $id)->first();
     }
+
+    public function getAll(){
+        return Category::all();
+    }
+
+    public function delete($id){
+        Category::destroy($id);
+    }
 }

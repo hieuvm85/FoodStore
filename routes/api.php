@@ -26,6 +26,10 @@ Route::group(['prefix'=> 'auth'],function(){
     //
     Route::get('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
+    //ccf
+    Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
+    Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
+    Route::get('characteristic/getAll', [ProductController::class, 'getAllCharacteristic']);
 } );
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
@@ -39,6 +43,17 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
         Route::group(['prefix' => 'product'], function () {
             Route::post('create', [ProductController::class, 'create']);
             Route::put('update', [ProductController::class, 'update']);
+        });
+
+        Route::group(['prefix' => 'ccf'], function () {
+            Route::post('flavor/create', [ProductController::class, 'createFlavor']);            
+            Route::delete('flavor/{id}', [ProductController::class, 'deleteFlavor']);
+
+            Route::post('category/create', [ProductController::class, 'createCategory']);            
+            Route::delete('category/{id}', [ProductController::class, 'deleteCategory']);
+
+            Route::post('characteristic/create', [ProductController::class, 'createCharacteristic']);            
+            Route::delete('characteristic/{id}', [ProductController::class, 'deleteCharacteristic']);
         });
     });
 } );

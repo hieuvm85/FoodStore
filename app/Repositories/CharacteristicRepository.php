@@ -13,4 +13,11 @@ class CharacteristicRepository{
     public function getCharacteristicById($id){
         return Characteristic::where('id', $id)->first();
     }
+
+    public function getAll(){
+        return Characteristic::all();
+    }
+    public function delete($id){
+        Characteristic::destroy($id);
+    }
 }

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Characteristic;
+use App\Models\Flavor;
 use App\Models\Image;
 use App\Models\Message;
 use App\Models\Product;
@@ -135,5 +138,64 @@ class ProductController extends Controller
         $product->categories()->sync($request->categories);
 
         return $product;
+    }
+
+
+
+    // Flavor Management
+    public function getAllFlavor(){
+        return $this->flavorRepository->getAll();
+    }
+    public function createFlavor(Request $request){
+        $flavor = new Flavor();
+        $flavor->title =   $request->title;
+        return response()->json(
+            $this->flavorRepository->saveOrUpdate($flavor),200);
+         
+    }
+    public function deleteFlavor(Request $request){
+        $this->flavorRepository->delete($request->id);
+        return response()->json([
+            'message' => "Success"  
+
+        ],200);
+    }
+
+    // Category Management
+    public function getAllCategory(){
+        return $this->categoryRepository->getAll();
+    }
+    public function createCategory(Request $request){
+        $category = new Category();
+        $category->title =   $request->title;
+        return response()->json(
+            $this->categoryRepository->saveOrUpdate($category),200);
+         
+    }
+    public function deleteCategory(Request $request){
+        $this->categoryRepository->delete($request->id);
+        return response()->json([
+            'message' => "Success"  
+
+        ],200);
+    }
+
+    // Characteristic Management
+    public function getAllCharacteristic(){
+        return $this->characteristicRepository->getAll();
+    }
+    public function createCharacteristic(Request $request){
+        $characteristic = new Characteristic();
+        $characteristic->title =   $request->title;
+        return response()->json(
+            $this->characteristicRepository->saveOrUpdate($characteristic),200);
+         
+    }
+    public function deleteCharacteristic(Request $request){
+        $this->characteristicRepository->delete($request->id);
+        return response()->json([
+            'message' => "Success"  
+
+        ],200);
     }
 }
