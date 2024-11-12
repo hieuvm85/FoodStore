@@ -19,6 +19,11 @@ class UserRepository{
         return User::with(['address'])->find($user->id);
     }
 
+    public function getAll(){
+        return User::all();
+    }
+
+
     public function createTemporaryUser($username){
         $loginField = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
@@ -39,11 +44,19 @@ class UserRepository{
     }
 
     public function getById($id){
-        return User::with(['address'])->find($id);
+        return User::with(['address','orders'])->find($id);
     }
 
     public function delete($id){
         return User::destroy($id);
+    }
+
+    public function adminSearch($keyword){
+        $user =  User::where('name',"like",'%{$keyword}%')
+                                ->orWhere('phone',"like","%{$keyword}%")
+                                ->orWhere('email',"like","%{$keyword}%")
+                                ->get();
+        return $user;
     }
 
 }

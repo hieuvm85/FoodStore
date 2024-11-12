@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->string('note');
             $table->string('payment_option');// PAYCASH, QRCODE
-            $table->string('status');
+            $table->string('status');// WAIT_CONFIRM, PREPARING, DELIVERING, DELIVERED, RETURN , CANCEL
             $table->timestamps();
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

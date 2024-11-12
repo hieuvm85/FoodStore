@@ -200,9 +200,9 @@ class UserController extends Controller
         }
     }
 
-    public function getUser(Request $request){
+    // public function getUser(Request $request){
         
-    }
+    // }
 
 
     public function setAddress(Request $request){
@@ -228,5 +228,61 @@ class UserController extends Controller
                 "message" =>$e->getMessage()
             ],400);
         }
+    }
+
+    public function register(){
+
+    }
+
+
+
+    public function getAll(){
+        try{        
+            return response()->json($this->userRepository->getAll(),200);       
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+    
+
+    public function getDetail(Request $request){
+        try{        
+            return response()->json($this->userRepository->getById($request->id),200);       
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+    public function adminEdit(Request $request){
+        try{
+            $user = $this->userRepository->getById($request->id);
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->password = $request->password;
+            $user->name = $request->name;
+            $user->role = $request->role;
+            $user->is_ban = $request->is_ban;
+            $this->userRepository->saveOrUpdate($user);
+            return response()->json([
+                "message" =>"success",
+                "user" =>$user
+            ],200);       
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+    public function adminSearch(Request $request){
+        $data= $this->userRepository->adminSearch($request->query("keyword"));
+        return response()->json($data,200);
     }
 }

@@ -32,6 +32,7 @@ Route::group(['prefix'=> 'auth'],function(){
     //
     Route::get('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
+    Route::get('search/text',[ProductController::class, 'searchByText']);
     //ccf
     Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
     Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
@@ -45,6 +46,11 @@ Route::group(['prefix'=> 'auth'],function(){
 } );
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
+    //order
+    Route::get('order/getAll', [OrderController::class, 'userGetAll']);
+    Route::get('order/get/{id}', [OrderController::class, 'userGetDetail']);
+    Route::patch('order/{id}/cancel', [OrderController::class, 'userCancel']);
+
     Route::get('logout', [UserController::class, 'logout']);
     Route::post('changePassword', [UserController::class, 'changePassword']);
     //feedback
@@ -58,6 +64,9 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
         Route::group(['prefix' => 'product'], function () {
             Route::post('create', [ProductController::class, 'create']);
             Route::put('update', [ProductController::class, 'update']);
+            Route::get('getAll', [ProductController::class, 'adminGetAll']);
+
+            Route::get('search', [ProductController::class, 'adminSearch']);
         });
 
         Route::group(['prefix' => 'ccf'], function () {
@@ -78,6 +87,19 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
             Route::get('get/{id}', [CouponController::class, 'show']);
         });
 
-          
+        Route::group(['prefix' => 'user'], function () {
+            Route::get('getAll', [UserController::class, 'getAll']);
+            Route::get('get/{id}', [UserController::class, 'getDetail']);
+            Route::put('edit', [UserController::class, 'adminEdit']);
+
+            Route::get('search', [UserController::class, 'adminSearch']);
+        });
+
+        Route::group(['prefix' => 'order'], function () {
+            Route::get('getAll', [OrderController::class, 'adminGetAll']);
+            Route::get('get/{id}', [OrderController::class, 'adminGetDetail']);
+            Route::put('{id}/edit/status', [OrderController::class, 'adminEditStatus']);
+            // Route::get('search', [OrderController::class, 'adminSearch']);
+        });
     });
 } );

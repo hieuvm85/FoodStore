@@ -15,6 +15,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\UserRepository;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -102,7 +103,7 @@ class OrderController extends Controller
                 }
                 // neu ton tai ca 2 user ma 2 user la 2 user kahc nhau phai gop lai
                 else{
-                    if($user->id!=$userE->id){
+                    if($user->id != $userE->id && $user->email =="temprorary@gmail.com"){
                         foreach($userE->feedbacks as $feedback){
                             $feedback->user_id=$user->id;
                             $this->feedbackRepository->saveOrUpdate($feedback);
@@ -146,5 +147,133 @@ class OrderController extends Controller
             ],400);
         }
     }
+
+
+
+    public function adminGetAll(Request $request){
+        try{
+            $status= $request->query('status');
+            // WAIT_CONFIRM, PREPARING, DELIVERING, DELIVERED, RETURN , CANCEL
+            if(!($status == null ||$status == '' ||$status == 'WAIT_CONFIRM' || $status == 'PREPARING' || $status == 'DELIVERING'|| $status == 'DELIVERED'|| $status == 'RETURN'|| $status == 'CANCEL')){
+                throw new Exception("Invalid status");
+            }
+           $orders = $this->orderRepository->adminGetAll($status);
+           return response()->json($orders,200);
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+
+
+
+
+    public function adminGetDetail(Request $request){
+        try{
+            $orders = $this->orderRepository->adminGetDetail($request->id);
+            return response()->json($orders,200);
+         }
+         catch (Exception $e){
+             return response()->json([
+                 "message" =>$e->getMessage()
+             ],400);
+        }
+    }
+    public function adminEditStatus(Request $request){
+        try{
+            $status= $request->query('status');
+            $order = $this->orderRepository->getByid($request->id);
+
+            // WAIT_CONFIRM, PREPARING, DELIVERING, DELIVERED, RETURN , CANCEL
+            if(!($status == 'WAIT_CONFIRM' || $status == 'PREPARING' || $status == 'DELIVERING'|| $status == 'DELIVERED'|| $status == 'RETURN'|| $status == 'CANCEL')){
+                throw new Exception("Invalid status");
+            }
+
+            $order->status = $status;
+            $this->orderRepository->saveOrUpdate($order);
+
+            return response()->json([
+                "message" =>"Success",
+                "order" =>$order
+            ]);
+
+        }
+        catch (Exception $e){
+ 
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
     
+    public function userCancel(Request $request){
+        try{
+            $order = $this->orderRepository->getByid($request->id);
+            if($order->user_id != Auth::user()->id ){
+                return response()->json([
+                    "message" =>"You are not allowed"
+                ],309); 
+            }
+            if($order->status == "WAIT_CONFIRM" || $order->status == "PREPARING" ){
+                $order->status = "CANCEL";
+                $this->orderRepository->saveOrUpdate($order);
+                return response()->json([
+                    "message" =>"Cancel successfully"
+                ],200); 
+            }
+
+            return response()->json([
+                "message" =>"Items in transit cannot be cancelled"
+            ],400); 
+
+
+            return response()->json([
+                "message" =>"Cancel Success"
+            ]);
+        }
+        catch (Exception $e){
+ 
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+
+    public function adminSearch(){
+
+    }
+
+    public function userGetAll(Request $request){
+        try{
+            $status= $request->query('status');
+            // WAIT_CONFIRM, PREPARING, DELIVERING, DELIVERED, RETURN , CANCEL
+            if(!($status == null ||$status == '' ||$status == 'WAIT_CONFIRM' || $status == 'PREPARING' || $status == 'DELIVERING'|| $status == 'DELIVERED'|| $status == 'RETURN'|| $status == 'CANCEL')){
+                throw new Exception("Invalid status");
+            }
+           $orders = $this->orderRepository->userGetAll(Auth::user()->id,$status);
+           return response()->json($orders,200);
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+    
+    public function userGetDetail(Request $request){
+        try{
+           $orders = $this->orderRepository->userGetDetail(Auth::user()->id,$request->id);
+           return response()->json($orders,200);
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
 }

@@ -98,7 +98,6 @@ class ProductController extends Controller
                 'quantity' => 'required|integer|min:0',
                 'selling_price' => 'required|integer|min:0',
                 'list_price' => 'required|integer|min:0',
-                ''
             ]);
 
             $product = $this->productRepository->getById($request->id);
@@ -129,6 +128,7 @@ class ProductController extends Controller
         $product->selling_price = $request->selling_price;
         $product->list_price = $request->list_price;
         $product->main_image = $request->main_image;
+        $product->is_selling = $request->is_selling ;
 
         $this->productRepository->saveOrUpdate($product);
         
@@ -197,4 +197,22 @@ class ProductController extends Controller
 
         ],200);
     }
+
+    // search 
+    public function searchByText(Request $request){
+        $data= $this->productRepository->searchByText($request->query("keyword"));
+        return response()->json($data,200);
+    }
+    public function searchByImgae(Request $request){
+        
+    }
+    public function adminSearch(Request $request){
+        $data= $this->productRepository->adminSearch($request->query("keyword"));
+        return response()->json($data,200);
+    }
+    public function adminGetAll(Request $request){
+        $data= $this->productRepository->adminGetAll();
+        return response()->json($data,200);
+    }
+    
 }
