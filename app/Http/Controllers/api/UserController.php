@@ -6,21 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendMailResetPaswordJob;
 use App\Jobs\SendOTPJob;
 use App\Mail\SendResetPasswordEmail;
+use App\Models\Address;
 use App\Models\User;
+use App\Repositories\AddressRepository;
 use App\Repositories\UserRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     //
     private $userRepository;
+    private $addressRepository;
     public function __construct()
     {
         $this->userRepository = new UserRepository();
+        $this->addressRepository = new AddressRepository();
     }
 
 
@@ -85,8 +90,10 @@ class UserController extends Controller
 
             return response()->json(['message' => 'check your mail'])->withCookie($cookie);
         }
-        catch(Exception $e){
-            return response()->json($e->getMessage());
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
         }
     }
 
@@ -104,8 +111,10 @@ class UserController extends Controller
             else
                 return response()->json(['status' => false]);
         }
-        catch(Exception $e){
-            return response()->json($e->getMessage());
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
         }
     }
 
@@ -146,8 +155,10 @@ class UserController extends Controller
                 'role' =>$user->role
             ]);
         }
-        catch(Exception $e){
-            return response()->json($e->getMessage());
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
         }
     }
 
@@ -182,8 +193,40 @@ class UserController extends Controller
                 'message' => 'Mật khẩu đã được thay đổi thành công.'
             ]);
         }
-        catch(Exception $e){
-            return response()->json($e->getMessage());
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+    public function getUser(Request $request){
+        
+    }
+
+
+    public function setAddress(Request $request){
+        DB::beginTransaction();
+        try{
+            $request->validate([
+                "detail"=>'required|string'
+            ]);
+
+            $address = $this->addressRepository->saveOrUpdate($request->detail);
+
+            $user = $this->userRepository->getById(Auth::user()->id);
+            $user->address_id = $address->id;
+
+            
+            return response()->json($this->userRepository->saveOrUpdate($user));
+
+            DB::commit();
+        }
+        catch (Exception $e){
+            DB::rollBack();
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
         }
     }
 }

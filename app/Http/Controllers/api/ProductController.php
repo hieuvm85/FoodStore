@@ -84,7 +84,6 @@ class ProductController extends Controller
     }
 
     public function show(Request $request){
-
         return $this->productRepository->getById($request->id);
     }
 
