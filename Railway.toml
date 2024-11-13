@@ -5,3 +5,7 @@ start = "php artisan serve --host=0.0.0.0 --port=${PORT}"
 [[services]]
 name = "queue-worker"
 start = "php artisan queue:work --daemon --sleep=3 --tries=3"
+
+[[services]]
+name = "laravel-app"
+start = "php artisan storage:link && php artisan serve --host=0.0.0.0 --port=${PORT}"
