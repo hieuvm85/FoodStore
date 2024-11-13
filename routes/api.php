@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['prefix'=> 'auth'],function(){
+    //image
+    Route::post('image/upload',[ImageController::class, 'upload']);
+    Route::get('image/{filename}', [ImageController::class, 'getImage']);
+    //
     Route::post('login',[UserController::class, 'login']);
     Route::post('register',[UserController::class, 'geregistertOTP']);
 
@@ -28,7 +32,7 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::post('resetPassword',[UserController::class, 'resetPassword']);
     Route::post('verifyOTP',[UserController::class, 'verifyOTP']);
     //
-    Route::post('image/upload',[ImageController::class, 'upload']);
+    
     //
     Route::get('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);

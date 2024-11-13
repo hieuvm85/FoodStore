@@ -26,7 +26,7 @@ class ImageController extends Controller
             
                 return response()->json([
                     'message' => 'Upload ảnh thành công!',
-                    'file_path' => 'storage/' . $filePath
+                    'file_path' => $filePath
                 ], 201);
             }
 
@@ -40,5 +40,17 @@ class ImageController extends Controller
                 'message' => $e->getMessage(),
             ] );
         }
+    }
+
+    public function getImage($filename)
+    {
+        $path = storage_path('app/public/uploads/' . $filename);
+
+        if (!file_exists($path)) {
+
+            return response()->json(['error' => 'File not found'], 404);
+        }
+
+        return response()->file($path);
     }
 }
