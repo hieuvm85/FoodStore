@@ -26,7 +26,7 @@ class ImageController extends Controller
             
                 return response()->json([
                     'message' => 'Upload ảnh thành công!',
-                    'file_path' => $filePath
+                    'file_path' => $fileName
                 ], 201);
             }
 
