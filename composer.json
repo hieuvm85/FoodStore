@@ -47,7 +47,8 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "queue-worker": "php artisan queue:work --sleep=3 --tries=3"
     },
     "extra": {
         "branch-alias": {
