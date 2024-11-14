@@ -25,7 +25,7 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('image/{filename}', [ImageController::class, 'getImage']);
     //
     Route::post('login',[UserController::class, 'login']);
-    Route::post('register',[UserController::class, 'geregistertOTP']);
+    Route::post('register',[UserController::class, 'register']);
 
 
     Route::post('getOTP',[UserController::class, 'getOTP']);
@@ -50,6 +50,8 @@ Route::group(['prefix'=> 'auth'],function(){
 } );
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
+    //get user
+    Route::get('user/get', [UserController::class, 'getByToken']);
     //order
     Route::get('order/getAll', [OrderController::class, 'userGetAll']);
     Route::get('order/get/{id}', [OrderController::class, 'userGetDetail']);

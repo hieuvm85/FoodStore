@@ -206,7 +206,6 @@ class UserController extends Controller
 
 
     public function setAddress(Request $request){
-        DB::beginTransaction();
         try{
             $request->validate([
                 "detail"=>'required|string'
@@ -215,24 +214,20 @@ class UserController extends Controller
             $address = $this->addressRepository->saveOrUpdate($request->detail);
 
             $user = $this->userRepository->getById(Auth::user()->id);
-            $user->address_id = $address->id;
+            $user->address_id = $address->id;  // Gán address_id cho user
 
-            
-            return response()->json($this->userRepository->saveOrUpdate($user));
+            $this->userRepository->saveOrUpdate($user); // Lưu lại thông tin người dùng
 
-            DB::commit();
+            return response()->json($user); 
         }
         catch (Exception $e){
-            DB::rollBack();
             return response()->json([
                 "message" =>$e->getMessage()
             ],400);
         }
     }
 
-    public function register(){
-
-    }
+    
 
 
 
@@ -284,5 +279,68 @@ class UserController extends Controller
     public function adminSearch(Request $request){
         $data= $this->userRepository->adminSearch($request->query("keyword"));
         return response()->json($data,200);
+    }
+
+
+
+    public function register(Request $request){
+        try{         
+            $request->validate([
+                'phone' => 'required|string', 
+                'name' => 'required|string', 
+                'email' => 'required|string', 
+                'password' => 'required|string',
+                'password_confirmation'=> 'required'
+            ]);  
+
+            if (!($request->password === $request->password_confirmation)) {
+                return response()->json([
+                    'message' => 'The password field confirmation does not match'
+                ], 400);
+            }
+
+            $userF = $this->userRepository->getUserByEmailOrPhone($request->phone);
+            $userE = $this->userRepository->getUserByEmailOrPhone($request->email);
+            if($userF){
+                throw new Exception('This phone number has been already if this is your phone, let click forget password');
+            }
+            if($userE){
+                throw new Exception('This email has been already please enter your new email');
+            }
+
+            $user = new User();
+            $user->phone= $request->phone;
+            $user->name= $request->name;
+            $user->password= $request->password;
+            $user->email= $request->email;
+            $user->is_ban= false;
+
+            $user=$this->userRepository->saveOrUpdate($user);
+            $token = $user->createToken('UserToken')->accessToken;
+
+        
+            return response()->json([
+                'message' =>"success",
+                'token' =>$token,
+                'role' =>$user->role
+            ]);     
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
+
+    public function getByToken(){
+        try{                   
+            return response()->json($this->userRepository->getById(Auth::user()->id),200);       
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
     }
 }
