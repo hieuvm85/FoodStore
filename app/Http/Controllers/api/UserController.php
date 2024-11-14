@@ -286,10 +286,10 @@ class UserController extends Controller
     public function register(Request $request){
         try{         
             $request->validate([
-                'phone' => 'required|string', 
-                'name' => 'required|string', 
-                'email' => 'required|string', 
-                'password' => 'required|string',
+                'phone' => 'required', 
+                'name' => 'required', 
+                'email' => 'required', 
+                'password' => 'required',
                 'password_confirmation'=> 'required'
             ]);  
 
