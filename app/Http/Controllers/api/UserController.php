@@ -285,13 +285,7 @@ class UserController extends Controller
 
     public function register(Request $request){
         try{         
-            $request->validate([
-                'phone' => 'required', 
-                'name' => 'required', 
-                'email' => 'required', 
-                'password' => 'required',
-                'password_confirmation'=> 'required'
-            ]);  
+
 
             if (!($request->password === $request->password_confirmation)) {
                 return response()->json([
@@ -316,6 +310,7 @@ class UserController extends Controller
             $user->is_ban= false;
 
             $user=$this->userRepository->saveOrUpdate($user);
+
             $token = $user->createToken('UserToken')->accessToken;
 
         
