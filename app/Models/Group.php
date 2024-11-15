@@ -10,13 +10,13 @@ class Group extends Model
     use HasFactory;
 
 
-    public function messagese()
+    public function messages()
     {
         return $this->hasMany(Message::class);
     }
 
     public function users()
     {
-        return $this->belongsToMany(User::class,'user_group');
+        return $this->belongsToMany(User::class,'group_user');
     }
 }

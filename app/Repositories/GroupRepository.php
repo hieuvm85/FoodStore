@@ -20,4 +20,8 @@ class GroupRepository{
     public function delete($id){
         Group::destroy($id);
     }
+
+    public function getByName($name){
+        return Group::where('name',$name)->first();
+    }
 }

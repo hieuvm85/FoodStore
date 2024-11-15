@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\api\CouponController;
 use App\Http\Controllers\api\FeedbackController;
+use App\Http\Controllers\api\GroupController;
 use App\Http\Controllers\api\ImageController;
+use App\Http\Controllers\api\MessageController;
 use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\UserController;
@@ -46,7 +48,12 @@ Route::group(['prefix'=> 'auth'],function(){
     //order
     Route::post('order/create',[OrderController::class, 'create']);    
     //coupon
-    Route::post('coupon/check',[CouponController::class, 'check']);    
+    Route::post('coupon/check',[CouponController::class, 'check']);   
+    // messages 
+    Route::group(['prefix' => 'message'], function () {
+        Route::get('group/connect',[GroupController::class, 'connect']);
+        Route::post('send',[MessageController::class, 'send']);
+    });
 } );
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
