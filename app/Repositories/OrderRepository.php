@@ -24,10 +24,10 @@ class OrderRepository{
     public function adminGetAll($status){
         $orderQuery = Order::with(['user','orderDetails','orderDetails.product']);
         if(!$status){
-            return $orderQuery->get();
+            return $orderQuery->paginate(10);
         }                
         
-        return $orderQuery->where('status',$status)->get();
+        return $orderQuery->where('status',$status)->paginate(10);
     }
 
 
@@ -44,10 +44,10 @@ class OrderRepository{
         $orderQuery = Order::with(['user','orderDetails','orderDetails.product'])
                         ->where('user_id',$id_user);
         if(!$status){
-            return $orderQuery->get();
+            return $orderQuery->paginate(10);
         }                
         
-        return $orderQuery->where('status',$status)->get();
+        return $orderQuery->where('status',$status)->paginate(10);
     }
 
     public function userGetDetail($id_user,$id_order){

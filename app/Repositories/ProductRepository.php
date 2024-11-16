@@ -11,11 +11,11 @@ class ProductRepository{
     }
 
     public function getAll(){
-        $products= Product::where('is_selling',true)->get();
+        $products= Product::where('is_selling',true)->paginate(10);
          return $products;
     }
     public function adminGetAll(){
-        $products= Product::all();
+        $products= Product::paginate(10);
         return $products;
     }
 
