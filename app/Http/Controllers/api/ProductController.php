@@ -203,8 +203,15 @@ class ProductController extends Controller
         $data= $this->productRepository->searchByText($request->query("keyword"));
         return response()->json($data,200);
     }
-    public function searchByImgae(Request $request){
-        
+    public function searchByImage(Request $request){
+        try{
+
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
     }
     public function adminSearch(Request $request){
         $data= $this->productRepository->adminSearch($request->query("keyword"));

@@ -56,6 +56,24 @@ class UserController extends Controller
         ]);
     }
 
+    public function refreshToken(){
+        try{
+
+            $user= $this->userRepository->getById(Auth::user()->id);
+            $token = $user->createToken('UserToken')->accessToken;
+            return response()->json([
+            
+                'token' =>$token,
+                'role' =>$user->role
+            ]);
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
+    }
+
 
     public function logout(){
         $user = Auth::user();

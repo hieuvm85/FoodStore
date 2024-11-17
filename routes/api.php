@@ -28,6 +28,7 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('image/{filename}', [ImageController::class, 'getImage']);
     //
     Route::post('login',[UserController::class, 'login']);
+    
     Route::post('register',[UserController::class, 'register']);
 
 
@@ -40,6 +41,7 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
     Route::get('search/text',[ProductController::class, 'searchByText']);
+    Route::get('search/image',[ProductController::class, 'searchByImage']);
     //ccf
     Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
     Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
@@ -60,6 +62,7 @@ Route::group(['prefix'=> 'auth'],function(){
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
     //get user
     Route::get('user/get', [UserController::class, 'getByToken']);
+    Route::get('refreshToken',[UserController::class, 'refreshToken']);
     //order
     Route::get('order/getAll', [OrderController::class, 'userGetAll']);
     Route::get('order/get/{id}', [OrderController::class, 'userGetDetail']);
