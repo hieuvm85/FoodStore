@@ -4,12 +4,18 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use App\Repositories\ImageRepository;
 use Exception;
 use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
     //
+    private $imageRepository;
+    public function __construct()
+    {
+        $this->imageRepository = new ImageRepository();
+    }
 
     public function upload(Request $request){
         try {
@@ -65,5 +71,10 @@ class ImageController extends Controller
         }
 
         return response()->file($path);
+    }
+
+
+    public function getAllToTrain(){
+        return response()->json($this->imageRepository->getAll());
     }
 }

@@ -13,5 +13,9 @@ class ImageRepository{
     public function getImageByid($id){
         return Image::where('id',$id)->first();
     }
+
+    public function getAll(){
+        return Image::all();
+    }
     
 }

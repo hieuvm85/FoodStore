@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\TrainingJob;
 use App\Models\Category;
 use App\Models\Characteristic;
 use App\Models\Flavor;
-use App\Models\Image;
-use App\Models\Message;
 use App\Models\Product;
 use App\Repositories\CategoryRepository;
 use App\Repositories\CharacteristicRepository;
@@ -17,6 +16,7 @@ use App\Repositories\ProductRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ProductController extends Controller
 {
@@ -206,6 +206,28 @@ class ProductController extends Controller
     }
     public function searchByImage(Request $request){
         try{
+            $url = "http://127.0.0.1:5000/search";
+            $file = $request->file('image');
+
+            $response = Http::attach(
+                'file', // Tên của field file trong FormData
+                file_get_contents($file->getRealPath()), // Nội dung file
+                $file->getClientOriginalName() // Tên file
+            )->post($url, [
+                'other_field' => 'value', // Các trường khác (nếu có)
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $products = $this->productRepository->getProductByImage($data['images']);
+
+                return response()->json([
+                    "products"=>$products,
+                    "image_ids"=>$data['images']
+                ]);
+            } else {
+                return response()->json(['message' => 'Lỗi khi gửi file', 'error' => $response->body()], 500);
+            }
 
         }
          catch(Exception $e){
@@ -224,5 +246,21 @@ class ProductController extends Controller
         $data= $this->productRepository->adminGetAll($page);
         return response()->json($data,200);
     }
-    
+    public function training(){
+        try{
+            // $url = "http://127.0.0.1:5000/train";
+            // $response=Http::get($url);
+            TrainingJob::dispatch();
+            return response()->json([
+                "products"=>"Success! training will be gone in a few minutes",     
+                // "data"=>$response->json()
+            ]);
+
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
+    }
 }

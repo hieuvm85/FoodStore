@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
@@ -126,8 +127,38 @@ class ProductRepository{
         return [
             "total" => $data['total'] ?? count($data),
             "data" => $data
-            
         ];
+    }
+
+    public function getProductByImage($imageIds){
+        $productIds = DB::table('images')
+            ->whereIn('id', $imageIds)   
+            ->pluck('product_id')        
+            ->toArray();            
+        $sortedProductIds = [];
+        foreach ($imageIds as $imageId) {
+            $productId = DB::table('images')->where('id', $imageId)->value('product_id');
+            if ($productId && !in_array($productId, $sortedProductIds)) {
+                $sortedProductIds[] = $productId;
+            }
+        }
+        $products =[];
+
+        foreach ($sortedProductIds as $productId){
+            $product = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+                            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+                            ->select(
+                                'products.*',
+                                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+                            )
+                            ->where('products.id', $productId) // Thêm điều kiện tìm theo id
+                            ->groupBy('products.id')
+                            ->first();
+            $products[] = $product;
+        }
+
+        return $products;
     }
 
     

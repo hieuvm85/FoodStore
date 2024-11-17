@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['prefix'=> 'auth'],function(){
     //image
+    Route::get('image/get/all',[ImageController::class, 'getAllToTrain']);
     Route::post('image/upload',[ImageController::class, 'upload']);
     Route::get('image/{filename}', [ImageController::class, 'getImage']);
     //
@@ -41,7 +42,7 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
     Route::get('search/text',[ProductController::class, 'searchByText']);
-    Route::get('search/image',[ProductController::class, 'searchByImage']);
+    Route::post('search/image',[ProductController::class, 'searchByImage']);
     //ccf
     Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
     Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
@@ -78,11 +79,12 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
 
     // route cho admin
     Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
+
         Route::group(['prefix' => 'product'], function () {
             Route::post('create', [ProductController::class, 'create']);
             Route::put('update', [ProductController::class, 'update']);
             Route::get('getAll', [ProductController::class, 'adminGetAll']);
-
+            Route::get('training', [ProductController::class, 'training']);
             Route::get('search', [ProductController::class, 'adminSearch']);
         });
 

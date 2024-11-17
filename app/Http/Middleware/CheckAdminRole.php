@@ -16,8 +16,6 @@ class CheckAdminRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        
         if(Auth::user()->role=='admin'){
             return $next($request);
         }
@@ -26,6 +24,5 @@ class CheckAdminRole
                 'message' => 'Bạn không có quyền truy cập.',
             ], 403);
         }
-        
     }
 }
