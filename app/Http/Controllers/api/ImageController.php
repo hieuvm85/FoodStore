@@ -29,7 +29,7 @@ class ImageController extends Controller
         
                     if ($filePath) {
                         $images[] = [
-                            "link" => asset('storage/uploads/' . $fileName) // Trả về link đầy đủ
+                            "link" => $fileName // Trả về link đầy đủ
                         ];
                     } else {
                         return response()->json([
