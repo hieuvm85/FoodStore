@@ -51,6 +51,10 @@ class UserRepository{
         return User::destroy($id);
     }
 
+    public function getAdmins(){
+        return User::where('role', 'admin')->get();
+    }
+
     public function adminSearch($keyword){
         $user =  User::where('name',"like",'%{$keyword}%')
                                 ->orWhere('phone',"like","%{$keyword}%")

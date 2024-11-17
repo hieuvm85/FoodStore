@@ -7,6 +7,7 @@ use App\Http\Controllers\api\ImageController;
 use App\Http\Controllers\api\MessageController;
 use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\ProductController;
+use App\Http\Controllers\api\StatisticController;
 use App\Http\Controllers\api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -113,6 +114,17 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
             Route::get('get/{id}', [OrderController::class, 'adminGetDetail']);
             Route::put('{id}/edit/status', [OrderController::class, 'adminEditStatus']);
             // Route::get('search', [OrderController::class, 'adminSearch']);
+        });
+
+        Route::group(['prefix' => 'chat'], function () {
+            Route::get('groups', [GroupController::class, 'adminGetGroup']);
+            Route::get('group/{id}/left_at', [GroupController::class, 'left_at']);
+        });
+
+        Route::group(['prefix' => 'statistic'], function () {
+            Route::get('topProduct', [StatisticController::class, 'topProduct']);
+            Route::get('topUser', [StatisticController::class, 'topUser']);
+            Route::get('revenue', [StatisticController::class, 'revenue']);
         });
     });
 } );

@@ -41,7 +41,8 @@ class CouponRepository{
         if(!$coupon){
             return [
                 "discount" =>$discount,
-                "amount"=>$total
+                "amount"=>$total,
+                "cpoupon_id"=>null
             ];
         }
 
@@ -67,7 +68,8 @@ class CouponRepository{
         return [
             "discount" =>$discount,
             "total" =>$total,
-            "amount"=>$total-$discount
+            "amount"=>$total-$discount,
+            "cpoupon_id"=>$coupon->id
         ];
 
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Events\AdminGetGroup;
 use App\Events\MessageSend;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
@@ -47,6 +48,12 @@ class MessageController extends Controller
             $message = $this->messageRepository->saveOrUpdate($message);
 
             event(new MessageSend($message,$group->name));
+
+            $admins = $this->userRepository->getAdmins();
+            foreach($admins as $admin){
+                $groups  = $this->groupRepository->adminGetGroup($admin->id);
+                event( new AdminGetGroup($groups));
+            }
             
             return response()->json([
                 "message"=>"success",

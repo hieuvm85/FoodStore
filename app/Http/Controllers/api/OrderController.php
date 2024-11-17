@@ -100,6 +100,7 @@ class OrderController extends Controller
                     $user->name= $request->user['name'];
                     $user->password= "foodstore247";
                     $user->address_id=$address->id;
+                    $user = $this->userRepository->saveOrUpdate($user);
                 }
                 // neu ton tai ca 2 user ma 2 user la 2 user kahc nhau phai gop lai
                 else{
