@@ -11,7 +11,7 @@ class ProductRepository{
         return $product;
     }
 
-    public function getAll()
+    public function getAll($page)
     {
         $products = Product::where('is_selling', true)
             ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
@@ -21,33 +21,69 @@ class ProductRepository{
                 DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
                 DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
             )
-            ->groupBy('products.id')
-            ->paginate(10);
+            ->groupBy('products.id');
     
-        return $products;
+        if(!$page)
+            return $products->get();
+        else
+            return $products->paginate(10);
     }
     
-    public function adminGetAll(){
-        $products= Product::paginate(10);
-        return $products;
+    public function adminGetAll($page){
+        $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->groupBy('products.id');
+
+        if(!$page)
+            return $products->get();
+        else
+            return $products->paginate(10);
     }
 
     
     public function getById($id){
         $product = Product::with(['flavors','categories','characteristics','feedbacks','images'])
-                            ->find($id);
+                            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+                            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+                            ->select(
+                                'products.*',
+                                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+                            )
+                            ->where('products.id', $id) // Thêm điều kiện tìm theo id
+                            ->groupBy('products.id')
+                            ->first();;
         return $product;
     }
     
 
-    public function adminSearch($keyword){
-        $product =  Product::where('title',"like","%{$keyword}%")
-                                ->orWhere('description',"like","%{$keyword}%")
-                                ->get();
-        return $product;
+    public function adminSearch($keyword,$page){
+        $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+        ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+        ->select(
+            'products.*',
+            DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+            DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+        )
+        ->where(function($query) use ($keyword) {
+            $query->where('title', 'like', "%{$keyword}%")
+                ->orWhere('description', 'like', "%{$keyword}%");
+        })
+        ->groupBy('products.id')
+        ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
+
+        if(!$page)
+            return $products->get();
+        else
+            return $products->paginate(10);
     }
 
-    public function searchByText($keyword){
+    public function searchByText($keyword,$page){
         $products = Product::where('is_selling', true)
             ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
@@ -61,10 +97,12 @@ class ProductRepository{
                     ->orWhere('description', 'like', "%{$keyword}%");
             })
             ->groupBy('products.id')
-            ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"])
-            ->get();
+            ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
 
-        return $products;
+        if(!$page)
+            return $products->get();
+        else
+            return $products->paginate(10);
     }
 
     

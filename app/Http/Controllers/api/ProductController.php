@@ -78,9 +78,9 @@ class ProductController extends Controller
     }
     
     //update sau
-    public function index(){
-
-        return $this->productRepository->getAll();
+    public function index(Request $request){
+        $page = $request->query('page');
+        return $this->productRepository->getAll($page);
     }
 
     public function show(Request $request){
@@ -200,7 +200,8 @@ class ProductController extends Controller
 
     // search 
     public function searchByText(Request $request){
-        $data= $this->productRepository->searchByText($request->query("keyword"));
+        $page = $request->query('page');
+        $data= $this->productRepository->searchByText($request->query("keyword"),$page);
         return response()->json($data,200);
     }
     public function searchByImage(Request $request){
@@ -214,11 +215,13 @@ class ProductController extends Controller
         }
     }
     public function adminSearch(Request $request){
-        $data= $this->productRepository->adminSearch($request->query("keyword"));
+        $page = $request->query('page');
+        $data= $this->productRepository->adminSearch($request->query("keyword"),$page);
         return response()->json($data,200);
     }
     public function adminGetAll(Request $request){
-        $data= $this->productRepository->adminGetAll();
+        $page = $request->query('page');
+        $data= $this->productRepository->adminGetAll($page);
         return response()->json($data,200);
     }
     
