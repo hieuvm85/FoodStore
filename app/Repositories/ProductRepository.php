@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 class ProductRepository{
     public function saveOrUpdate(Product $product){
@@ -10,10 +11,22 @@ class ProductRepository{
         return $product;
     }
 
-    public function getAll(){
-        $products= Product::where('is_selling',true)->paginate(10);
-         return $products;
+    public function getAll()
+    {
+        $products = Product::where('is_selling', true)
+            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->groupBy('products.id')
+            ->paginate(10);
+    
+        return $products;
     }
+    
     public function adminGetAll(){
         $products= Product::paginate(10);
         return $products;
