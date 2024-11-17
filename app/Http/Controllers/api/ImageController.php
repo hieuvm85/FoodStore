@@ -12,33 +12,46 @@ class ImageController extends Controller
     //
 
     public function upload(Request $request){
-        try{
+        try {
             $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
+                'images' => 'required|array',
+                'images.*' => 'image|max:2048' // Mỗi file phải là ảnh, dung lượng tối đa 2MB
             ]);
-
-            
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('uploads', $fileName, 'public');
-
-            
+        
+            if ($request->hasFile('images')) {
+                $files = $request->file('images');
+                $images = [];
+        
+                foreach ($files as $file) {
+                    // Tạo tên file duy nhất bằng uniqid()
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $filePath = $file->storeAs('uploads', $fileName, 'public');
+        
+                    if ($filePath) {
+                        $images[] = [
+                            "link" => asset('storage/uploads/' . $fileName) // Trả về link đầy đủ
+                        ];
+                    } else {
+                        return response()->json([
+                            'message' => 'Có lỗi xảy ra khi lưu ảnh: ' . $file->getClientOriginalName()
+                        ], 500);
+                    }
+                }
+        
                 return response()->json([
                     'message' => 'Upload ảnh thành công!',
-                    'file_path' => $fileName
+                    'images' => $images
                 ], 201);
             }
-
+        
             return response()->json([
                 'message' => 'Không có ảnh nào được tải lên.'
             ], 400);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ] );
+            ], 400);
         }
     }
 
