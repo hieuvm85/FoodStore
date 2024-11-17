@@ -22,11 +22,18 @@ class ProductRepository{
                 DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
             )
             ->groupBy('products.id');
-    
+
+
         if(!$page)
-            return $products->get();
+            $data = $products->get();
         else
-            return $products->paginate(10);
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
     }
     
     public function adminGetAll($page){
@@ -40,9 +47,15 @@ class ProductRepository{
             ->groupBy('products.id');
 
         if(!$page)
-            return $products->get();
+            $data = $products->get();
         else
-            return $products->paginate(10);
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
     }
 
     
@@ -78,9 +91,15 @@ class ProductRepository{
         ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
 
         if(!$page)
-            return $products->get();
+            $data = $products->get();
         else
-            return $products->paginate(10);
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
     }
 
     public function searchByText($keyword,$page){
@@ -100,9 +119,15 @@ class ProductRepository{
             ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
 
         if(!$page)
-            return $products->get();
+            $data = $products->get();
         else
-            return $products->paginate(10);
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
     }
 
     
