@@ -130,11 +130,7 @@ class ProductRepository{
         ];
     }
 
-    public function getProductByImage($imageIds){
-        $productIds = DB::table('images')
-            ->whereIn('id', $imageIds)   
-            ->pluck('product_id')        
-            ->toArray();            
+    public function getProductByImage($imageIds){          
         $sortedProductIds = [];
         foreach ($imageIds as $imageId) {
             $productId = DB::table('images')->where('id', $imageId)->value('product_id');
@@ -153,6 +149,7 @@ class ProductRepository{
                                 DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
                             )
                             ->where('products.id', $productId) // Thêm điều kiện tìm theo id
+                            ->where('is_selling',true)
                             ->groupBy('products.id')
                             ->first();
             $products[] = $product;

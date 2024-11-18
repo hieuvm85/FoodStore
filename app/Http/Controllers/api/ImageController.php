@@ -21,7 +21,7 @@ class ImageController extends Controller
         try {
             $request->validate([
                 'images' => 'required|array',
-                'images.*' => 'image|max:2048' // Mỗi file phải là ảnh, dung lượng tối đa 2MB
+                'images.*' => 'image|max:10240' // Mỗi file phải là ảnh, dung lượng tối đa 2MB
             ]);
         
             if ($request->hasFile('images')) {
