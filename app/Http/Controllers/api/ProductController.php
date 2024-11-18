@@ -206,7 +206,7 @@ class ProductController extends Controller
     }
     public function searchByImage(Request $request){
         try{
-            $url = "http://127.0.0.1:5000/search";
+            $url = "https://foodstoresbibe-production.up.railway.app/search";
             $file = $request->file('image');
 
             $response = Http::attach(

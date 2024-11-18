@@ -28,7 +28,7 @@ class TrainingJob implements ShouldQueue
     public function handle(): void
     {
         //
-        $url = "http://127.0.0.1:5000/train";
+        $url = "https://foodstoresbibe-production.up.railway.app/train";
         $response=Http::get($url);
 
          // Kiểm tra xem yêu cầu có thành công không
