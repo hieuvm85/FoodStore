@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\Order;
+use App\Models\Product;
+use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 
 class OrderRepository{
     public function saveOrUpdate(Order $order){
@@ -56,5 +58,23 @@ class OrderRepository{
                             ->where('user_id',$id_user)->get();                          
                        
         return $order;
+    }
+
+    public function getCart($cartsReqest){
+        $total = 0;
+        $carts = [];
+        foreach($cartsReqest as $cart){
+            $product = Product::find($cart['product_id']);
+            $total += $product->selling_price * $cart['quantity'];
+
+            $carts[] = [
+                "product"=> $product,
+                "quantity"=> $cart['quantity']
+            ];
+        }
+        return [
+            "carts"=>$carts,
+            "total"=>$total
+        ];
     }
 }

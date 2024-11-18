@@ -278,4 +278,21 @@ class OrderController extends Controller
             ],400);
         }
     }
+
+    public function getCarts(Request $request){
+        try{    
+            $data = $this->orderRepository->getCart($request->carts);
+            return response()->json([
+                "message" => "success",
+                "data"=> $data 
+                // "data"=>$response->json()
+            ]);
+
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
+    }
 }

@@ -50,7 +50,9 @@ Route::group(['prefix'=> 'auth'],function(){
     //feedback
     Route::post('feedback/create',[FeedbackController::class, 'create']);
     //order
-    Route::post('order/create',[OrderController::class, 'create']);    
+    Route::post('order/create',[OrderController::class, 'create']);
+    //cart
+    Route::post('carts/get', [OrderController::class, 'getCarts']);    
     //coupon
     Route::post('coupon/check',[CouponController::class, 'check']);   
     // messages 
@@ -64,6 +66,7 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
     //get user
     Route::get('user/get', [UserController::class, 'getByToken']);
     Route::get('refreshToken',[UserController::class, 'refreshToken']);
+    
     //order
     Route::get('order/getAll', [OrderController::class, 'userGetAll']);
     Route::get('order/get/{id}', [OrderController::class, 'userGetDetail']);
