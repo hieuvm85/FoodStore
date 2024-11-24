@@ -28,6 +28,7 @@ class OrderController extends Controller
     private $addressRepository;
     private $productRepository;
     private $feedbackRepository;
+    private $momoController;
     public function __construct()
     {
         $this->productRepository = new ProductRepository();
@@ -37,6 +38,7 @@ class OrderController extends Controller
         $this->orderDetailRepository = new OrderDetailRepository(); 
         $this->orderRepository = new OrderRepository();
         $this->feedbackRepository = new FeedbackRepository();
+        $this->momoController = new MomoPayController();
     }
 
 
@@ -64,6 +66,7 @@ class OrderController extends Controller
             $order->amount= $caculate['amount'];
             $order->note= $request->note;
             $order->payment_option= $request->payment_option;
+            $order->status_pay= "pending";
             $order->discount= $caculate['discount'];
             $order->status = "WAIT_CONFIRM";
 
@@ -136,9 +139,24 @@ class OrderController extends Controller
 
                 $this->orderDetailRepository->saveOrUpdate($orderDetail);
             }
+            $data = null;
+            if($order->payment_option == "PAYCASH"){
+                $order->status_pay= "paycash";
+            }
+            else if($order->payment_option == "MOMO_ATM"){
+                $order->status_pay= "pending";
+                $data = $this->momoController->atm_momo_payment($order->amount,$order->id);
+            }
+            else if($order->payment_option == "MOMO_QRCODE"){
+                $order->status_pay= "pending";
+                $data = $this->momoController->qr_momo_payment($order->amount,$order->id);
+            }
+
+            $order = $this->orderRepository->saveOrUpdate($order);
             DB::commit();
             return response()->json([
-                "message" => "orderSuccess"
+                "message" => "Success",
+                "data" => $data
             ],200);
         }
         catch (Exception $e){

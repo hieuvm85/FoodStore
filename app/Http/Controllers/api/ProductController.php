@@ -77,11 +77,7 @@ class ProductController extends Controller
         }
     }
     
-    //update sau
-    public function index(Request $request){
-        $page = $request->query('page');
-        return $this->productRepository->getAll($page);
-    }
+
 
     public function show(Request $request){
         return $this->productRepository->getById($request->id);
@@ -262,6 +258,21 @@ class ProductController extends Controller
                 "message"=>$e->getMessage(),
             ],401);
         }
+    }
+
+    //update sau
+    public function index(Request $request)
+    {
+        $page = $request->query('page');
+        $view_products = $request->view_products;
+        return $this->productRepository->getAll_2($view_products,$page);
+    }
+
+    public function getALL(Request $request)
+    {
+        $page = $request->query('page');
+        $view_products = $request->view_products;
+        return $this->productRepository->getAll_1($view_products,$page);
     }
 
 

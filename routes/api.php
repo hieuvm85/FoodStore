@@ -5,6 +5,7 @@ use App\Http\Controllers\api\FeedbackController;
 use App\Http\Controllers\api\GroupController;
 use App\Http\Controllers\api\ImageController;
 use App\Http\Controllers\api\MessageController;
+use App\Http\Controllers\api\MomoPayController;
 use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\StatisticController;
@@ -23,6 +24,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['prefix'=> 'auth'],function(){
+    //payment
+    Route::get('payment/momo/atm',[MomoPayController::class, 'atm_momo_payment']);
+    Route::get('payment/momo/redirect',[MomoPayController::class, 'redirect']);
+    Route::post('payment/momo/updateSatusOrder',[MomoPayController::class, 'updateSatusOrder']);// callback momo
     //image
     Route::get('image/get/all',[ImageController::class, 'getAllToTrain']);
     Route::post('image/upload',[ImageController::class, 'upload']);
@@ -39,7 +44,8 @@ Route::group(['prefix'=> 'auth'],function(){
     //
     
     //
-    Route::get('products',[ProductController::class, 'index']);
+    Route::get('products',[ProductController::class, 'getALL']);
+    Route::post('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
     Route::get('search/text',[ProductController::class, 'searchByText']);
     Route::post('search/image',[ProductController::class, 'searchByImage']);

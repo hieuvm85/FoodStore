@@ -12,30 +12,7 @@ class ProductRepository{
         return $product;
     }
 
-    public function getAll($page)
-    {
-        $products = Product::where('is_selling', true)
-            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
-            ->groupBy('products.id');
 
-
-        if(!$page)
-            $data = $products->get();
-        else
-            $data= $products->paginate(10);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-            
-        ];
-    }
     
     public function adminGetAll($page){
         $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
@@ -158,6 +135,103 @@ class ProductRepository{
         return $products;
     }
 
-    
-                                
+
+
+    public function getAll_1($page)
+    {
+        $products = Product::where('is_selling', true)
+            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->groupBy('products.id');
+
+        if(!$page)
+            $data = $products->get();
+        else
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
+    }
+         
+    public function getAll_2($userViewedData,$page)
+    {
+        $productIds = collect($userViewedData)->pluck('product_id');
+
+        // Tạo mảng map sản phẩm với số lần xem (view_num)
+        $productViewsMap = collect($userViewedData)->keyBy('product_id')->mapWithKeys(function ($item) {
+            return [$item['product_id'] => $item['view_num']];
+        });
+
+        // Lấy top 2 categories yêu thích
+        $favoriteCategories = DB::table('category_product')
+        ->select('category_id', DB::raw('SUM(CASE WHEN category_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+        ->groupBy('category_id')
+        ->orderByDesc('total_views')
+        ->limit(2)
+        ->pluck('category_id');
+
+        // Lấy top 2 flavors yêu thích
+        $favoriteFlavors = DB::table('flavor_product')
+        ->select('flavor_id', DB::raw('SUM(CASE WHEN flavor_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+        ->groupBy('flavor_id')
+        ->orderByDesc('total_views')
+        ->limit(2)
+        ->pluck('flavor_id');
+
+        // Lấy top 2 characteristics yêu thích
+        $favoriteCharacteristics = DB::table('characteristic_product')
+        ->select('characteristic_id', DB::raw('SUM(CASE WHEN characteristic_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+        ->groupBy('characteristic_id')
+        ->orderByDesc('total_views')
+        ->limit(2)
+        ->pluck('characteristic_id');
+
+
+        $products = Product::where('is_selling', true)
+            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->groupBy('products.id')
+            ->withCount([
+                'categories as matching_categories' => function ($query) use ($favoriteCategories) {
+                    $query->whereIn('categories.id', $favoriteCategories);
+                },
+                'flavors as matching_flavors' => function ($query) use ($favoriteFlavors) {
+                    $query->whereIn('flavors.id', $favoriteFlavors);
+                },
+                'characteristics as matching_characteristics' => function ($query) use ($favoriteCharacteristics) {
+                    $query->whereIn('characteristics.id', $favoriteCharacteristics);
+                },
+            ])
+            ->orderByRaw('matching_categories + matching_flavors + matching_characteristics DESC');
+            // ->selectRaw('products.*, 
+            //     (matching_categories + matching_flavors + matching_characteristics) as relevance_score, 
+            //     view_num as purchase_score') // Tính điểm sự liên quan và điểm lượt xem
+            // ->orderByDesc('relevance_score') // Sắp xếp theo độ liên quan
+            // ->orderByRaw('purchase_score DESC');
+
+
+        if(!$page)
+            $data = $products->get();
+        else
+            $data= $products->paginate(10);
+
+        return [
+            "total" => $data['total'] ?? count($data),
+            "data" => $data
+            
+        ];
+    }
 }
