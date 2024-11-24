@@ -6,15 +6,18 @@ use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
-class ProductRepository{
-    public function saveOrUpdate(Product $product){
+class ProductRepository
+{
+    public function saveOrUpdate(Product $product)
+    {
         $product->save();
         return $product;
     }
 
 
-    
-    public function adminGetAll($page){
+
+    public function adminGetAll($page)
+    {
         $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
             ->select(
@@ -24,63 +27,66 @@ class ProductRepository{
             )
             ->groupBy('products.id');
 
-        if(!$page)
+        if (!$page) {
             $data = $products->get();
-        else
-            $data= $products->paginate(20);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-            
-        ];
+            return [
+                "data" => $data,
+                "total" => count($data)
+            ];
+        } else {
+            $data = $products->paginate(20);
+            return $data;
+        }
     }
 
-    
-    public function getById($id){
-        $product = Product::with(['flavors','categories','characteristics','feedbacks','images'])
-                            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-                            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-                            ->select(
-                                'products.*',
-                                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-                            )
-                            ->where('products.id', $id) // Thêm điều kiện tìm theo id
-                            ->groupBy('products.id')
-                            ->first();;
+
+    public function getById($id)
+    {
+        $product = Product::with(['flavors', 'categories', 'characteristics', 'feedbacks', 'images'])
+            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->where('products.id', $id) // Thêm điều kiện tìm theo id
+            ->groupBy('products.id')
+            ->first();;
         return $product;
     }
-    
 
-    public function adminSearch($keyword,$page){
+
+    public function adminSearch($keyword, $page)
+    {
         $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-        ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-        ->select(
-            'products.*',
-            DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-            DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-        )
-        ->where(function($query) use ($keyword) {
-            $query->where('title', 'like', "%{$keyword}%")
-                ->orWhere('description', 'like', "%{$keyword}%");
-        })
-        ->groupBy('products.id')
-        ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+            )
+            ->where(function ($query) use ($keyword) {
+                $query->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('description', 'like', "%{$keyword}%");
+            })
+            ->groupBy('products.id')
+            ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
 
-        if(!$page)
+        if (!$page) {
             $data = $products->get();
-        else
-            $data= $products->paginate(20);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-            
-        ];
+            return [
+                "data" => $data,
+                "total" => count($data)
+            ];
+        } else {
+            $data = $products->paginate(20);
+            return $data;
+        }
     }
 
-    public function searchByText($keyword,$page){
+    public function searchByText($keyword, $page)
+    {
         $products = Product::where('is_selling', true)
             ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
@@ -89,25 +95,27 @@ class ProductRepository{
                 DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
                 DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
             )
-            ->where(function($query) use ($keyword) {
+            ->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('description', 'like', "%{$keyword}%");
             })
             ->groupBy('products.id')
             ->orderByRaw("CASE WHEN title LIKE ? THEN 1 ELSE 2 END", ["%{$keyword}%"]);
 
-        if(!$page)
+        if (!$page) {
             $data = $products->get();
-        else
-            $data= $products->paginate(20);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-        ];
+            return [
+                "data" => $data,
+                "total" => count($data)
+            ];
+        } else {
+            $data = $products->paginate(20);
+            return $data;
+        }
     }
 
-    public function getProductByImage($imageIds){          
+    public function getProductByImage($imageIds)
+    {
         $sortedProductIds = [];
         foreach ($imageIds as $imageId) {
             $productId = DB::table('images')->where('id', $imageId)->value('product_id');
@@ -115,20 +123,20 @@ class ProductRepository{
                 $sortedProductIds[] = $productId;
             }
         }
-        $products =[];
+        $products = [];
 
-        foreach ($sortedProductIds as $productId){
+        foreach ($sortedProductIds as $productId) {
             $product = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-                            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-                            ->select(
-                                'products.*',
-                                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-                            )
-                            ->where('products.id', $productId) // Thêm điều kiện tìm theo id
-                            ->where('is_selling',true)
-                            ->groupBy('products.id')
-                            ->first();
+                ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+                ->select(
+                    'products.*',
+                    DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
+                    DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+                )
+                ->where('products.id', $productId) // Thêm điều kiện tìm theo id
+                ->where('is_selling', true)
+                ->groupBy('products.id')
+                ->first();
             $products[] = $product;
         }
 
@@ -149,19 +157,19 @@ class ProductRepository{
             )
             ->groupBy('products.id');
 
-        if(!$page)
+        if (!$page) {
             $data = $products->get();
-        else
-            $data= $products->paginate(20);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-            
-        ];
+            return [
+                "data" => $data,
+                "total" => count($data)
+            ];
+        } else {
+            $data = $products->paginate(20);
+            return $data;
+        }
     }
-         
-    public function getAll_2($userViewedData,$page)
+
+    public function getAll_2($userViewedData, $page)
     {
         $productIds = collect($userViewedData)->pluck('product_id');
 
@@ -172,27 +180,27 @@ class ProductRepository{
 
         // Lấy top 2 categories yêu thích
         $favoriteCategories = DB::table('category_product')
-        ->select('category_id', DB::raw('SUM(CASE WHEN category_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
-        ->groupBy('category_id')
-        ->orderByDesc('total_views')
-        ->limit(2)
-        ->pluck('category_id');
+            ->select('category_id', DB::raw('SUM(CASE WHEN category_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+            ->groupBy('category_id')
+            ->orderByDesc('total_views')
+            ->limit(2)
+            ->pluck('category_id');
 
         // Lấy top 2 flavors yêu thích
         $favoriteFlavors = DB::table('flavor_product')
-        ->select('flavor_id', DB::raw('SUM(CASE WHEN flavor_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
-        ->groupBy('flavor_id')
-        ->orderByDesc('total_views')
-        ->limit(2)
-        ->pluck('flavor_id');
+            ->select('flavor_id', DB::raw('SUM(CASE WHEN flavor_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+            ->groupBy('flavor_id')
+            ->orderByDesc('total_views')
+            ->limit(2)
+            ->pluck('flavor_id');
 
         // Lấy top 2 characteristics yêu thích
         $favoriteCharacteristics = DB::table('characteristic_product')
-        ->select('characteristic_id', DB::raw('SUM(CASE WHEN characteristic_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
-        ->groupBy('characteristic_id')
-        ->orderByDesc('total_views')
-        ->limit(2)
-        ->pluck('characteristic_id');
+            ->select('characteristic_id', DB::raw('SUM(CASE WHEN characteristic_product.product_id IN (' . implode(',', $productIds->toArray()) . ') THEN ' . implode('+', $productViewsMap->toArray()) . ' END) as total_views'))
+            ->groupBy('characteristic_id')
+            ->orderByDesc('total_views')
+            ->limit(2)
+            ->pluck('characteristic_id');
 
 
         $products = Product::where('is_selling', true)
@@ -216,22 +224,22 @@ class ProductRepository{
                 },
             ])
             ->orderByRaw('matching_categories + matching_flavors + matching_characteristics DESC');
-            // ->selectRaw('products.*, 
-            //     (matching_categories + matching_flavors + matching_characteristics) as relevance_score, 
-            //     view_num as purchase_score') // Tính điểm sự liên quan và điểm lượt xem
-            // ->orderByDesc('relevance_score') // Sắp xếp theo độ liên quan
-            // ->orderByRaw('purchase_score DESC');
+        // ->selectRaw('products.*, 
+        //     (matching_categories + matching_flavors + matching_characteristics) as relevance_score, 
+        //     view_num as purchase_score') // Tính điểm sự liên quan và điểm lượt xem
+        // ->orderByDesc('relevance_score') // Sắp xếp theo độ liên quan
+        // ->orderByRaw('purchase_score DESC');
 
 
-        if(!$page)
+        if (!$page) {
             $data = $products->get();
-        else
-            $data= $products->paginate(20);
-
-        return [
-            "total" => $data['total'] ?? count($data),
-            "data" => $data
-            
-        ];
+            return [
+                "data" => $data,
+                "total" => count($data)
+            ];
+        } else {
+            $data = $products->paginate(20);
+            return $data;
+        }
     }
 }
