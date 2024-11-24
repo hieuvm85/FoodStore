@@ -25,8 +25,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['prefix'=> 'auth'],function(){
     //payment
-    Route::get('payment/momo/atm',[MomoPayController::class, 'atm_momo_payment']);
-    Route::get('payment/momo/redirect',[MomoPayController::class, 'redirect']);
+    // Route::get('payment/momo/atm',[MomoPayController::class, 'atm_momo_payment']);
+    // Route::get('payment/momo/redirect',[MomoPayController::class, 'redirect']);
     Route::post('payment/momo/updateSatusOrder',[MomoPayController::class, 'updateSatusOrder']);// callback momo
     //image
     Route::get('image/get/all',[ImageController::class, 'getAllToTrain']);

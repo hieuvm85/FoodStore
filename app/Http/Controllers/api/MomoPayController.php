@@ -153,12 +153,12 @@ class MomoPayController extends Controller
         
     }
     
-    public function redirect()
-    {
-        return response()->json([
-            'status'=>"ok"
-        ]);
-    }
+    // public function redirect()
+    // {
+    //     return response()->json([
+    //         'status'=>"ok"
+    //     ]);
+    // }
     public function updateSatusOrder(Request $request)
     {
         try{
