@@ -27,7 +27,7 @@ class ProductRepository{
         if(!$page)
             $data = $products->get();
         else
-            $data= $products->paginate(10);
+            $data= $products->paginate(20);
 
         return [
             "total" => $data['total'] ?? count($data),
@@ -71,7 +71,7 @@ class ProductRepository{
         if(!$page)
             $data = $products->get();
         else
-            $data= $products->paginate(10);
+            $data= $products->paginate(20);
 
         return [
             "total" => $data['total'] ?? count($data),
@@ -99,7 +99,7 @@ class ProductRepository{
         if(!$page)
             $data = $products->get();
         else
-            $data= $products->paginate(10);
+            $data= $products->paginate(20);
 
         return [
             "total" => $data['total'] ?? count($data),
@@ -152,7 +152,7 @@ class ProductRepository{
         if(!$page)
             $data = $products->get();
         else
-            $data= $products->paginate(10);
+            $data= $products->paginate(20);
 
         return [
             "total" => $data['total'] ?? count($data),
@@ -226,7 +226,7 @@ class ProductRepository{
         if(!$page)
             $data = $products->get();
         else
-            $data= $products->paginate(10);
+            $data= $products->paginate(20);
 
         return [
             "total" => $data['total'] ?? count($data),

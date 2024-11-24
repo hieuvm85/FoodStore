@@ -213,6 +213,7 @@ class ProductController extends Controller
                 'other_field' => 'value', // Các trường khác (nếu có)
             ]);
 
+            
             if ($response->successful()) {
                 $data = $response->json();
                 $products = $this->productRepository->getProductByImage($data['images']);
@@ -265,14 +266,16 @@ class ProductController extends Controller
     {
         $page = $request->query('page');
         $view_products = $request->view_products;
+        if(!$view_products){
+            return $this->productRepository->getAll_1($page);
+        }
         return $this->productRepository->getAll_2($view_products,$page);
     }
 
     public function getALL(Request $request)
     {
         $page = $request->query('page');
-        $view_products = $request->view_products;
-        return $this->productRepository->getAll_1($view_products,$page);
+        return $this->productRepository->getAll_1($page);
     }
 
 
