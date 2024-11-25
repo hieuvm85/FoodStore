@@ -216,12 +216,9 @@ class ProductController extends Controller
             
             if ($response->successful()) {
                 $data = $response->json();
-                $products = $this->productRepository->getProductByImage($data['images']);
+                $data = $this->productRepository->getProductByImage($data['images']);
 
-                return response()->json([
-                    "products"=>$products,
-                    "image_ids"=>$data['images']
-                ]);
+                return response()->json($data);
             } else {
                 return response()->json(['message' => 'Lỗi khi gửi file', 'error' => $response->body()], 500);
             }

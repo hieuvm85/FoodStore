@@ -126,6 +126,9 @@ class ProductRepository
         $products = [];
 
         foreach ($sortedProductIds as $productId) {
+            if(count($products)==20){
+                break;
+            }
             $product = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
                 ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
                 ->select(
@@ -140,7 +143,10 @@ class ProductRepository
             $products[] = $product;
         }
 
-        return $products;
+        return [
+            "total"=>20,
+            "data"=>$products
+        ];
     }
 
 
