@@ -198,6 +198,7 @@ class ProductController extends Controller
     public function searchByText(Request $request){
         $page = $request->query('page');
         $data= $this->productRepository->searchByText($request->query("keyword"),$page);
+        
         return response()->json($data,200);
     }
     public function searchByImage(Request $request){
@@ -275,5 +276,17 @@ class ProductController extends Controller
         return $this->productRepository->getAll_1($page);
     }
 
+    public function filter(Request $request){
+        try{
+            $page = $request->query('page');
+            $data = $this->productRepository->filter($request->filters,$page);
+            return response()->json($data);
 
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
+    }
 }

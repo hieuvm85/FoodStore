@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Repositories\AddressRepository;
 use App\Repositories\UserRepository;
 use Exception;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -303,8 +304,6 @@ class UserController extends Controller
 
     public function register(Request $request){
         try{         
-
-
             if (!($request->password === $request->password_confirmation)) {
                 return response()->json([
                     'message' => 'The password field confirmation does not match'
@@ -330,7 +329,7 @@ class UserController extends Controller
             $user=$this->userRepository->saveOrUpdate($user);
 
             $token = $user->createToken('UserToken')->accessToken;
-
+            $user->sendEmailVerificationNotification();
         
             return response()->json([
                 'message' =>"success",
@@ -355,5 +354,29 @@ class UserController extends Controller
                 "message" =>$e->getMessage()
             ],400);
         }
+    }
+
+
+    public function verify(Request $request, $id, $hash)
+    {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json(['message' => 'User not found.'], 404);
+            }
+
+            if (sha1($user->getEmailForVerification()) !== $hash) {
+                return response()->json(['message' => 'Invalid verification link.'], 400);
+            }
+
+            if ($user->hasVerifiedEmail()) {
+                return response()->json(['message' => 'Email already verified.'], 200);
+            }
+
+            if ($user->markEmailAsVerified()) {
+                event(new Verified($user));
+            }
+
+            return response()->json(['message' => 'Email has been verified.'], 200);
     }
 }

@@ -47,8 +47,10 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('products',[ProductController::class, 'getALL']);
     Route::post('products',[ProductController::class, 'index']);
     Route::get('products/{id}',[ProductController::class, 'show']);
+    //search
     Route::get('search/text',[ProductController::class, 'searchByText']);
     Route::post('search/image',[ProductController::class, 'searchByImage']);
+    Route::post('filter',[ProductController::class, 'filter']);
     //ccf
     Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
     Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
@@ -142,3 +144,8 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
         });
     });
 } );
+
+
+Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
