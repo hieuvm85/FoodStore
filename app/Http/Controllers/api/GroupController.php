@@ -78,7 +78,7 @@ class GroupController extends Controller
                 "groups"=>$groups,
                 "channel_name"=>"adminChat",
                 "event_name"=>"adminChat"
-            ],401); 
+            ],200); 
         }
         catch(Exception $e){
             DB::rollBack();
