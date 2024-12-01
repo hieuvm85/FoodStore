@@ -24,7 +24,8 @@ class GroupRepository{
     }
 
     public function getByName($name){
-        return Group::where('name',$name)->first();
+        return Group::with('messages')
+                ->where('name',$name)->first();
     }
 
 

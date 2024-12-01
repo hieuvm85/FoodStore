@@ -49,7 +49,7 @@ class GroupController extends Controller
                 }
             }
 
-            $messages = $group->messages();
+            $messages = $group->messages;
 
             DB::commit();
             return response()->json([
