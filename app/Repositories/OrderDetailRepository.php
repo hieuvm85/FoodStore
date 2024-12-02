@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\OrderDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class OrderDetailRepository{
@@ -69,39 +70,53 @@ class OrderDetailRepository{
         return $topUsersData;
     }
 
-    public function revenue($status,$start_date,$end_date){
-        $orders = DB::table('orders')
-            ->join('users', 'orders.user_id', '=', 'users.id') // Kết nối với bảng users để lấy thông tin người dùng
-            ->leftJoin('order_details', 'orders.id', '=', 'order_details.order_id') // Kết nối với bảng order_details để tính tổng số sản phẩm
-            ->whereBetween('orders.created_at', [$start_date, $end_date]) // Lọc theo thời gian
-            ->when($status !== "", function($query) use ($status) {
-                return $query->where('orders.status', $status); // Lọc theo trạng thái nếu status không phải chuỗi rỗng
-            })
-            ->groupBy('orders.id', 'users.name') // Nhóm theo đơn hàng và tên người dùng
-            ->select(
-                'orders.id',
-                'orders.amount',
-                'orders.status',
-                'orders.created_at',
-                'users.name as user_name',
-                'users.phone as user_phone',
-                DB::raw('SUM(order_details.quantity) as total_products') // Tính tổng số sản phẩm trong mỗi đơn hàng
-            )
-            ->orderByDesc('orders.created_at') // Sắp xếp từ mới nhất
-            ->get();
-        
-        // Tính tổng tiền của tất cả các đơn hàng
-        $totalAmount = DB::table('orders')
-            ->whereBetween('orders.created_at', [$start_date, $end_date]) // Lọc theo thời gian
-            ->when($status !== "", function($query) use ($status) {
-                return $query->where('orders.status', $status); // Lọc theo trạng thái nếu status không phải chuỗi rỗng
-            })
-            ->sum(DB::raw('amount + discount')); // Tính tổng tiền (bao gồm discount)
+    public function revenue($start_date, $end_date)
+    {
+        // Chuyển đổi sang Carbon nếu không phải đối tượng Carbon
+        $start_date = $start_date instanceof Carbon ? $start_date : Carbon::parse($start_date);
+        $end_date = $end_date instanceof Carbon ? $end_date : Carbon::parse($end_date);
 
-            return [
-                'orders' => $orders,
-                'total_amount' => $totalAmount
-            ];
+        // Tạo danh sách tất cả các ngày trong khoảng thời gian
+        $all_dates = [];
+        for ($date = $start_date->copy(); $date->lte($end_date); $date->addDay()) {
+            $all_dates[] = $date->format('Y-m-d');
+        }
+
+        // Truy vấn lấy dữ liệu từ cơ sở dữ liệu
+        $data = DB::table('orders')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(CASE WHEN status = "delivered" THEN 1 END) as total_delivered'),
+                DB::raw('COUNT(CASE WHEN status = "cancel" THEN 1 END) as total_cancel'),
+                DB::raw('CAST(SUM(CASE WHEN status = "delivered" THEN amount ELSE 0 END) AS SIGNED) as total_amount_delivered')
+            )
+            ->whereBetween('created_at', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get()
+            ->keyBy('date'); // Sắp xếp dữ liệu theo ngày để dễ dàng tìm kiếm
+
+        // Khởi tạo mảng kết quả
+        $label = [];
+        $value1 = [];
+        $value2 = [];
+        $value3 = [];
+
+        // Lặp qua danh sách ngày đầy đủ
+        foreach ($all_dates as $date) {
+            $label[] = $date;
+            $value1[] = isset($data[$date]) ? $data[$date]->total_delivered : 0;
+            $value2[] = isset($data[$date]) ? $data[$date]->total_cancel : 0;
+            $value3[] = isset($data[$date]) ? $data[$date]->total_amount_delivered : 0;
+        }
+
+        // Kết quả
+        return [
+            'label' => $label,
+            'value1' => $value1,
+            'value2' => $value2,
+            'value3' => $value3,
+        ];
     }
 
         

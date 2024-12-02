@@ -68,8 +68,7 @@ class StatisticController extends Controller
         try{
             $start_date = $request->query('start_date');
             $end_date = $request->query('end_date');
-            $status = $request->query('status') ?? "DELEVERED";
-            return response()->json($this->orderDetailRepository->revenue($status,$start_date,$end_date));
+            return response()->json($this->orderDetailRepository->revenue($start_date,$end_date));
             
         }
         catch(Exception $e){
