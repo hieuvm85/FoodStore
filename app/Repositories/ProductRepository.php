@@ -42,13 +42,13 @@ class ProductRepository
 
     public function getById($id)
     {
-        $product = Product::with(['flavors', 'categories', 'characteristics', 'feedbacks', 'images'])
+        $product = Product::with(['flavors', 'categories', 'characteristics', 'feedbacks','feedbacks.user', 'images'])
             ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
             ->select(
                 'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
+                DB::raw('ROUND(COALESCE(AVG(feedback.star), 0), 2) as star'),
+                DB::raw('CAST(COALESCE(SUM(order_details.quantity), 0) AS FLOAT) as total_sold')
             )
             ->where('products.id', $id) // Thêm điều kiện tìm theo id
             ->groupBy('products.id')
