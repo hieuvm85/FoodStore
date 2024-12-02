@@ -303,6 +303,7 @@ class UserController extends Controller
 
 
     public function register(Request $request){
+        DB::beginTransaction();
         try{         
             if (!($request->password === $request->password_confirmation)) {
                 return response()->json([
@@ -330,7 +331,7 @@ class UserController extends Controller
 
             $token = $user->createToken('UserToken')->accessToken;
             $user->sendEmailVerificationNotification();
-        
+            DB::commit();
             return response()->json([
                 'message' =>"success",
                 'token' =>$token,
@@ -338,6 +339,7 @@ class UserController extends Controller
             ]);     
         }
         catch (Exception $e){
+            DB::rollBack();
             return response()->json([
                 "message" =>$e->getMessage()
             ],400);
