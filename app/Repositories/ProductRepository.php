@@ -47,7 +47,7 @@ class ProductRepository
             ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
             ->select(
                 'products.*',
-                DB::raw('ROUND(COALESCE(AVG(feedback.star), 0), 2) as star'),
+                DB::raw('CAST(COALESCE(AVG(feedback.star), 0) AS FLOAT) as star'),
                 DB::raw('CAST(COALESCE(SUM(order_details.quantity), 0) AS FLOAT) as total_sold')
             )
             ->where('products.id', $id) // Thêm điều kiện tìm theo id
