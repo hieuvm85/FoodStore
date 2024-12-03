@@ -117,6 +117,10 @@ class OrderController extends Controller
                     // new la 1 user thi khong lam gi ca
                 }
             }
+            if($user->address_id==null){
+                $user->address_id=$address->id;
+                $user = $this->userRepository->saveOrUpdate($user);
+            }
             $order->user_id=$user->id;
             $order = $this->orderRepository->saveOrUpdate($order);
             //xu li orderDetails
