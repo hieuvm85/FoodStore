@@ -31,30 +31,38 @@ class UserController extends Controller
 
 
     public function login(Request $request){
-        $request->validate([
-            'username' => 'required', // Có thể là email hoặc số điện thoại
-            'password' => 'required',
-        ]);
-
-        
-        $user = $this->userRepository->getUserByEmailOrPhone($request->username);
-       
-        if ( !$user || !($request->password === $user->password) ) {
-            return response()->json([
-                'message' => 'Thông tin đăng nhập không đúng.'
-            ], 401);
-        }
-
-
-
-        $token = $user->createToken('UserToken')->accessToken;
-
-        
-        return response()->json([
+        try{
+            $request->validate([
+                'username' => 'required', // Có thể là email hoặc số điện thoại
+                'password' => 'required',
+            ]);
+    
+            $user = $this->userRepository->getUserByEmailOrPhone($request->username);
+           
+            if ( !$user) {
+                return response()->json([
+                    'message' => 'Nguời dùng không tồn tại'
+                ], 401);
+            }
+            if($request->password != $user->password){
+                return response()->json([
+                    'message' => 'Sai Mật khẩu'
+                ], 401);
+            }
+            $token = $user->createToken('UserToken')->accessToken;
+    
             
-            'token' =>$token,
-            'role' =>$user->role
-        ]);
+            return response()->json([
+                
+                'token' =>$token,
+                'role' =>$user->role
+            ]);
+        }
+        catch (Exception $e){
+            return response()->json([
+                "message" =>$e->getMessage()
+            ],400);
+        }
     }
 
     public function refreshToken(){
