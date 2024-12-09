@@ -34,7 +34,7 @@ class UserRepository{
         }
         else{
             $user->phone=$username;
-            $user->email = "temprorary@gmail.com";
+            $user->email = $username."@gmail.com";
         }
         $user->name="temprorary";
         $user->password="foodstore247";
