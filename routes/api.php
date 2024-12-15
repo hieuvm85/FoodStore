@@ -93,10 +93,12 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
 
         Route::group(['prefix' => 'product'], function () {
             Route::post('create', [ProductController::class, 'create']);
+            Route::post('import', [ProductController::class, 'import']);
             Route::put('update', [ProductController::class, 'update']);
             Route::get('getAll', [ProductController::class, 'adminGetAll']);
             Route::get('training', [ProductController::class, 'training']);
             Route::get('search', [ProductController::class, 'adminSearch']);
+
         });
 
         Route::group(['prefix' => 'ccf'], function () {

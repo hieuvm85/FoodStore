@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ImportProductsJob;
 use App\Jobs\TrainingJob;
 use App\Models\Category;
 use App\Models\Characteristic;
@@ -282,6 +283,29 @@ class ProductController extends Controller
             $data = $this->productRepository->filter($request->filters,$page);
             return response()->json($data);
 
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
+    }
+
+    public function import (Request $request){
+        try{
+            $products = $request->data;
+            if(!$products){
+                if(!$request->file('file')){
+                    throw new Exception("data not found");
+                }
+                $json = file_get_contents($request->file('file')->getRealPath());
+                $products = json_decode($json, true);
+            }
+           
+            ImportProductsJob::dispatch($products);
+            return response()->json([
+                "message"=>"success",
+            ],200);
         }
          catch(Exception $e){
             return response()->json([
