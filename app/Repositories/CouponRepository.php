@@ -69,7 +69,7 @@ class CouponRepository{
             "discount" =>$discount,
             "total" =>$total,
             "amount"=>$total-$discount,
-            "cpoupon_id"=>$coupon->id
+            "coupon_id"=>$coupon->id
         ];
 
     }

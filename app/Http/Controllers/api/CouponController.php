@@ -94,7 +94,10 @@ class CouponController extends Controller
                 throw new Exception("Coupon not found",400);
             }
             $data=$this->couponRepository->caculate($coupon,$request->carts);
-            return response()->json($data,200);
+            return response()->json([
+                "data" => $data,
+                "message" =>"success",
+            ],200);
         }
         catch (Exception $e){
             return response()->json([
