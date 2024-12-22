@@ -112,8 +112,8 @@ class MomoPayController extends Controller
         $amount = $amount;
         // $orderId = time() . "";
         $orderId = time() . "_" . $order_id;
-        $redirectUrl = "http://127.0.0.1:8000/api/auth/payment/momo/redirect";// redirect ve trang order
-        $ipnUrl = "http://127.0.0.1:8000/api/auth/payment/momo/updateSatusOrder";// callback
+        $redirectUrl = "https://ecommerce-fe-psi.vercel.app";// redirect ve trang order
+        $ipnUrl = "https://foodstore-production-167c.up.railway.app/api/auth/payment/momo/updateSatusOrder";// callback
         $extraData = "";
 
 
