@@ -49,6 +49,8 @@ class OrderController extends Controller
                 'amount' => 'required',
                 'payment_option' => 'required|string',
                 'discount' => 'required',
+                'address'=>'required',
+                'carts' => 'required',
             ]);
 
             $order= new Order();

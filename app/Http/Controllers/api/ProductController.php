@@ -313,4 +313,18 @@ class ProductController extends Controller
             ],401);
         }
     }
+    public function getFilterTitle(){
+        try{
+            return response()->json([
+                'categories'=>$this->categoryRepository->getALL(),
+                'characteristics'=>$this->characteristicRepository->getALL(),
+                'flavors'=>$this->flavorRepository->getALL()
+            ],200);
+        }
+         catch(Exception $e){
+            return response()->json([
+                "message"=>$e->getMessage(),
+            ],401);
+        }
+    }
 }

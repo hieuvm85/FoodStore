@@ -51,6 +51,8 @@ Route::group(['prefix'=> 'auth'],function(){
     Route::get('search/text',[ProductController::class, 'searchByText']);
     Route::post('search/image',[ProductController::class, 'searchByImage']);
     Route::post('filter',[ProductController::class, 'filter']);
+    Route::get('getFilterTitle',[ProductController::class, 'getFilterTitle']);
+
     //ccf
     Route::get('flavor/getAll', [ProductController::class, 'getAllFlavor']);
     Route::get('category/getAll', [ProductController::class, 'getAllCategory']);
