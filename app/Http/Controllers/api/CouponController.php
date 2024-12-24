@@ -105,5 +105,7 @@ class CouponController extends Controller
             ],400);
         }
     }
-
+    public function test(){
+        return response()->json("ok");
+    }
 }

@@ -64,12 +64,15 @@ Route::group(['prefix'=> 'auth'],function(){
     //cart
     Route::post('carts/get', [OrderController::class, 'getCarts']);    
     //coupon
-    Route::post('coupon/check',[CouponController::class, 'check']);   
+    Route::post('coupon/check',[CouponController::class, 'check']); 
+    
     // messages 
     Route::group(['prefix' => 'message'], function () {
         Route::get('group/connect',[GroupController::class, 'connect']);
         Route::post('send',[MessageController::class, 'send']);
     });
+
+    Route::post('test',[CouponController::class, 'test']);     
 } );
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
