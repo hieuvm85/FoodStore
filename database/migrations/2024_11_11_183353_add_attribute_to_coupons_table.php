@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('coupons', function (Blueprint $table) {
             //
-            $table->timestamp("expiration_date");
+            $table->timestamp("expiration_date")->default('1970-01-01 00:00:01');
         });
     }
 
