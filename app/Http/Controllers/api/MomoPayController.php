@@ -60,7 +60,7 @@ class MomoPayController extends Controller
         // $orderId = time() . "";
 
         $redirectUrl = "https://ecommerce-fe-psi.vercel.app";// redirect ve trang order
-        $ipnUrl = "https://foodstore-production-167c.up.railway.app/api/auth/payment/momo/updateSatusOrder";// callback
+        $ipnUrl = "http://13.54.3.150/api/auth/payment/momo/updateSatusOrder";// callback
         $extraData = "";
 
 
@@ -113,7 +113,7 @@ class MomoPayController extends Controller
         // $orderId = time() . "";
         $orderId = time() . "_" . $order_id;
         $redirectUrl = "https://ecommerce-fe-psi.vercel.app";// redirect ve trang order
-        $ipnUrl = "https://foodstore-production-167c.up.railway.app/api/auth/payment/momo/updateSatusOrder";// callback
+        $ipnUrl = "http://13.54.3.150/api/auth/payment/momo/updateSatusOrder";// callback
         $extraData = "";
 
 
