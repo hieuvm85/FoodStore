@@ -16,6 +16,7 @@ use App\Repositories\ImageRepository;
 use App\Repositories\ProductRepository;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -272,9 +273,16 @@ class ProductController extends Controller
     }
 
     public function getALL(Request $request)
-    {
-        $page = $request->query('page');
-        return $this->productRepository->getAll_1($page);
+    {   
+        $page = $request->query('page');    
+        $keyCache = $page?"merchandise".$page : "merchandise";
+        $data= Cache::get($keyCache);
+        if($data){
+            return $data;
+        }
+        $data =  $this->productRepository->getAll_1($page);
+        Cache::put($keyCache, $data, 3600);
+        return $data;
     }
 
     public function filter(Request $request){

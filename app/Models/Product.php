@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -67,4 +68,16 @@ class Product extends Model
 
         return $query;
     }
+    public function scopeWithAverageStarAndTotalSold(Builder $query)
+    {
+        $query->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
+            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
+            ->select(
+                'products.*',
+                DB::raw('CAST(COALESCE(AVG(feedback.star), 0) AS FLOAT) as star'),
+                DB::raw('CAST(COALESCE(SUM(order_details.quantity), 0) AS FLOAT) as total_sold')
+            );
+        return $query;
+    }
+    
 }

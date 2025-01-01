@@ -18,13 +18,7 @@ class ProductRepository
 
     public function adminGetAll($page)
     {
-        $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
+        $products = Product::withAverageStarAndTotalSold()
             ->groupBy('products.id');
 
         if (!$page) {
@@ -43,13 +37,7 @@ class ProductRepository
     public function getById($id)
     {
         $product = Product::with(['flavors', 'categories', 'characteristics', 'feedbacks','feedbacks.user', 'images'])
-            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('CAST(COALESCE(AVG(feedback.star), 0) AS FLOAT) as star'),
-                DB::raw('CAST(COALESCE(SUM(order_details.quantity), 0) AS FLOAT) as total_sold')
-            )
+            ->withAverageStarAndTotalSold()
             ->where('products.id', $id) // Thêm điều kiện tìm theo id
             ->groupBy('products.id')
             ->first();;
@@ -59,13 +47,7 @@ class ProductRepository
 
     public function adminSearch($keyword, $page)
     {
-        $products = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
+        $products = Product::withAverageStarAndTotalSold()
             ->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('description', 'like', "%{$keyword}%");
@@ -88,13 +70,7 @@ class ProductRepository
     public function searchByText($keyword, $page)
     {
         $products = Product::where('is_selling', true)
-            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
+            ->withAverageStarAndTotalSold()
             ->where(function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")
                     ->orWhere('description', 'like', "%{$keyword}%");
@@ -129,13 +105,7 @@ class ProductRepository
             if(count($products)==20){
                 break;
             }
-            $product = Product::leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-                ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-                ->select(
-                    'products.*',
-                    DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                    DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-                )
+            $product = Product::withAverageStarAndTotalSold()
                 ->where('products.id', $productId) // Thêm điều kiện tìm theo id
                 ->where('is_selling', true)
                 ->groupBy('products.id')
@@ -154,13 +124,7 @@ class ProductRepository
     public function getAll_1($page)
     {
         $products = Product::where('is_selling', true)
-            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
+            ->withAverageStarAndTotalSold()
             ->groupBy('products.id');
 
         if (!$page) {
@@ -210,13 +174,7 @@ class ProductRepository
 
 
         $products = Product::where('is_selling', true)
-            ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-            ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-            ->select(
-                'products.*',
-                DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-                DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-            )
+            ->withAverageStarAndTotalSold()
             ->groupBy('products.id')
             ->withCount([
                 'categories as matching_categories' => function ($query) use ($favoriteCategories) {
@@ -251,13 +209,7 @@ class ProductRepository
 
     public function filter($filters,$page){
         $products = Product::where('is_selling', true)
-        ->leftJoin('feedback', 'products.id', '=', 'feedback.product_id')
-        ->leftJoin('order_details', 'products.id', '=', 'order_details.product_id')
-        ->select(
-            'products.*',
-            DB::raw('COALESCE(AVG(feedback.star), 0) as star'),
-            DB::raw('COALESCE(SUM(order_details.quantity), 0) as total_sold')
-        )
+        ->withAverageStarAndTotalSold()
         ->groupBy('products.id')
         ->filter($filters);
 
